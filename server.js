@@ -12,30 +12,40 @@ server.connection({ port: process.env.PORT || 3000 });
 
 // Dummy data for users database (n.b. unhashed password === 'bacon')
 const users = {
-  john: {
-    username: 'john',
+  troy: {
+    username: 'troy',
     password: '$2a$08$fV9AJ7I21AhZhtRoXoV16u4h/pN1kWBLMPKkQE8BkH/.cgaOwbMi2',
     name: 'John Doe',
     id: '2133d32a',
     isAdmin: false,
   },
+  rory: {
+    username: 'rory',
+    password: '$2a$08$fV9AJ7I21AhZhtRoXoV16u4h/pN1kWBLMPKkQE8BkH/.cgaOwbMi2',
+    name: 'John Doe',
+    id: '4133d32a',
+    isAdmin: true,
+  },
 };
 
-
+// Declare validateFuncs (see docs for full details)
 // validateFunc required by Basic Auth strategy, must call callback with upto 3 arguments:
 // 1: error
 // 2: boolean value of whether validation succeeded
-// 3:
-const validate = (request, username, password, callback) => {
+// 3: data which will be available at request.auth.credentials
+
+// validateAsUser - checks a user is in user database and password is valid
+const validateAsUser = (request, username, password, callback) => {
   const user = users[username];
   if (!user) return callback(null, false);
 
   Bcrypt.compare(password, user.password, (err, isValid) => {
-    callback(err, isValid, { id: user.id, name: user.name, isAdmin: user.isAdmin });
+    callback(err, isValid, { id: user.id, name: user.name });
   });
 };
 
-const validateAdmin = (request, username, password, callback) => {
+// validateAsAdmin - checks a user is in user database, password is valid and user isAdmin
+const validateAsAdmin = (request, username, password, callback) => {
   const user = users[username];
   if (!user) return callback(null, false);
 
@@ -44,23 +54,38 @@ const validateAdmin = (request, username, password, callback) => {
   });
 };
 
+// Register basic auth scheme with Hapi
 server.register(Basic, err => {
   if (err) throw err;
 
-  server.auth.strategy('simple', 'basic', { validateFunc: validate });
-  server.auth.strategy('admin', 'basic', { validateFunc: validateAdmin });
+  // Create user strategy - by supplying the validateAsUser function
+  server.auth.strategy('user', 'basic', { validateFunc: validateAsUser });
 
+  // Create admin strategy - by supplying the validateAsAdmin function
+  server.auth.strategy('admin', 'basic', { validateFunc: validateAsAdmin });
+
+  // Create an unauthenticated route
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler(request, reply) {
+      reply('Unauthenticated');
+    }
+  });
+
+  // Create a route with user level authentication
   server.route({
     method: 'GET',
     path: '/authenticated',
     config: {
-      auth: 'simple',
+      auth: 'user',
       handler(request, reply) {
         reply(`hello ${request.auth.credentials.name}`);
       }
     }
   });
 
+  // Create a route with admin level authentication
   server.route({
     method: 'GET',
     path: '/admin',
@@ -69,14 +94,6 @@ server.register(Basic, err => {
       handler(request, reply) {
         reply(`hello ${request.auth.credentials.name}`);
       }
-    }
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/',
-    handler(request, reply) {
-      reply('Unauthenticated');
     }
   });
 
