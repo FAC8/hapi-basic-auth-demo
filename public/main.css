@@ -1,0 +1,28 @@
+.title {
+  width: 50%;
+  margin: auto;
+}
+
+.login-section {
+  width: 75%;
+  margin: auto;
+}
+
+.login-box {
+  width: 40%;
+  display: inline-block;
+  border: 2px solid green;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.image {
+  width: 75%;
+  margin: auto;
+}
+
+.info {
+  width: 75%;
+  margin: auto;
+  text-align: center;
+}
