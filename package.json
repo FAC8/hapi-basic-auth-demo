@@ -18,7 +18,9 @@
   "homepage": "https://github.com/FAC8/hapi-basic-auth-demo#readme",
   "dependencies": {
     "bcrypt": "^0.8.7",
+    "bell": "^8.0.0",
     "hapi": "^13.5.0",
-    "hapi-auth-basic": "^4.2.0"
+    "hapi-auth-basic": "^4.2.0",
+    "hapi-auth-cookie": "^6.1.1"
   }
 }

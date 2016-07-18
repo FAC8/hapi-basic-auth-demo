@@ -1,3 +1,4 @@
+'use strict'
 const Hapi = require('hapi');
 
 // Bcrypt module - creates a hash and provides method for comparing a string to a hash
@@ -8,6 +9,11 @@ const Basic = require('hapi-auth-basic');
 
 // Create server and start a connection
 const server = new Hapi.Server();
+
+const Bell = require('bell')
+
+var AuthCookie = require('hapi-auth-cookie');
+
 server.connection({ port: process.env.PORT || 3000 });
 
 // Dummy data for users database (n.b. unhashed password === 'bacon')
@@ -27,7 +33,18 @@ const users = {
     isAdmin: true,
   },
 };
-
+var bellAuthOptions = {
+  provider: 'github',
+  password: 'github-encryption-password-need-to-reach-32-characters', //Password used for encryption
+  clientId: '2febb531827677c14e44',//'YourAppId',
+  clientSecret: '8171beef6004dd3be31eca444b268dedd2d24d66',//'YourAppSecret',
+  isSecure: false
+};
+var authCookieOptions = {
+  password: 'cookie-encryption-password-need-to-be-longer', //Password used for encryption
+  cookie: 'sitepoint-auth', // Name of cookie to set
+  isSecure: false
+};
 // Declare validateFuncs (see docs for full details)
 // validateFunc required by Basic Auth strategy, must call callback with upto 3 arguments:
 // 1: error
@@ -55,7 +72,7 @@ const validateAsAdmin = (request, username, password, callback) => {
 };
 
 // Register basic auth scheme with Hapi
-server.register(Basic, err => {
+server.register([Basic,Bell, AuthCookie], err => {
   if (err) throw err;
 
   // Create user strategy - by supplying the validateAsUser function
@@ -63,6 +80,15 @@ server.register(Basic, err => {
 
   // Create admin strategy - by supplying the validateAsAdmin function
   server.auth.strategy('admin', 'basic', { validateFunc: validateAsAdmin });
+
+  //Create oAuth strategy
+  server.auth.strategy('github-oauth', 'bell', bellAuthOptions);
+
+  //Create cookie strategy
+  server.auth.strategy('site-point-cookie', 'cookie', authCookieOptions);
+
+  // default on cookie
+  server.auth.default('site-point-cookie');
 
   // Create an unauthenticated route
   server.route({
@@ -93,6 +119,21 @@ server.register(Basic, err => {
       auth: 'admin',
       handler(request, reply) {
         reply(`hello ${request.auth.credentials.name}`);
+      }
+    }
+  });
+  // create oAuth endpoint for github
+  server.route({
+    method: 'GET',
+    path: '/oauth',
+    config: {
+      auth: 'github-oauth',
+      handler: function (request, reply) {
+        if (request.auth.isAuthenticated) {
+          console.log(request.auth.session)
+          request.cookieAuth.set(request.auth.credentials);
+          return reply('Hello ' + request.auth.credentials.profile.displayName);
+        }    
       }
     }
   });
