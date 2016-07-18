@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/FAC8/hapi-basic-auth-demo#readme",
   "dependencies": {
-    "bcrypt": "^0.8.7",
+    "bcryptjs": "^2.3.0",
     "bell": "^8.0.0",
     "hapi": "^13.5.0",
     "hapi-auth-basic": "^4.2.0",

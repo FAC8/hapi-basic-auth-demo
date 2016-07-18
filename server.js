@@ -2,13 +2,23 @@
 const Hapi = require('hapi');
 
 // Bcrypt module - creates a hash and provides method for comparing a string to a hash
-const Bcrypt = require('bcrypt');
+const Bcrypt = require('bcryptjs');
 
 // Basic Authentication Scheme for Hapi (https://github.com/hapijs/hapi-auth-basic)
 const Basic = require('hapi-auth-basic');
 
+const Path = require('path');
+
 // Create server and start a connection
-const server = new Hapi.Server();
+const server = new Hapi.Server({
+    connections: {
+        routes: {
+            files: {
+                relativeTo: Path.join(__dirname, 'public')
+            }
+        }
+    }
+});
 
 const Bell = require('bell')
 
@@ -95,7 +105,7 @@ server.register([Basic,Bell, AuthCookie], err => {
     method: 'GET',
     path: '/',
     handler(request, reply) {
-      reply('Unauthenticated');
+      reply.file('index.html');
     }
   });
 
@@ -133,7 +143,7 @@ server.register([Basic,Bell, AuthCookie], err => {
           console.log(request.auth.session)
           request.cookieAuth.set(request.auth.credentials);
           return reply('Hello ' + request.auth.credentials.profile.displayName);
-        }    
+        }
       }
     }
   });
