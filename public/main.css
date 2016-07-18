@@ -17,12 +17,19 @@
 }
 
 .image {
-  width: 75%;
+  width: 50%;
   margin: auto;
 }
 
 .info {
   width: 75%;
   margin: auto;
+  text-align: center;
+}
+
+.back-button {
+  width: 25%;
+  border: 2px solid green;
+  border-radius: 10px;
   text-align: center;
 }
