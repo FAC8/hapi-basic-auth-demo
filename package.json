@@ -1,0 +1,24 @@
+{
+  "name": "hapi-basic-auth-demo",
+  "version": "1.0.0",
+  "description": "A demo app using Hapi Basic Auth based on official Hapi Auth documentation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FAC8/hapi-basic-auth-demo.git"
+  },
+  "author": "Matt Glover <matthewglover@me.com> (https://github.com/matthewglover)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FAC8/hapi-basic-auth-demo/issues"
+  },
+  "homepage": "https://github.com/FAC8/hapi-basic-auth-demo#readme",
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "hapi": "^13.5.0",
+    "hapi-auth-basic": "^4.2.0"
+  }
+}
