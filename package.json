@@ -4,7 +4,9 @@
   "description": "A demo app using Hapi Basic Auth based on official Hapi Auth documentation",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "nodemon": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,7 @@
     "bell": "^8.0.0",
     "hapi": "^13.5.0",
     "hapi-auth-basic": "^4.2.0",
-    "hapi-auth-cookie": "^6.1.1"
+    "hapi-auth-cookie": "^6.1.1",
+    "inert": "^4.0.1"
   }
 }

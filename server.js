@@ -7,9 +7,18 @@ const Bcrypt = require('bcryptjs');
 // Basic Authentication Scheme for Hapi (https://github.com/hapijs/hapi-auth-basic)
 const Basic = require('hapi-auth-basic');
 
-const Path = require('path');
+// Bell is a module for interacting with the 3rd party authentication of some popular
+// websites such as facebook and twitter
+const Bell = require('bell')
 
-// Create server and start a connection
+// Auth cookie module for Hapi
+const AuthCookie = require('hapi-auth-cookie');
+
+// Path and Inert are used to serve up static files
+const Path = require('path');
+const Inert = require('inert');
+
+// Create server and start a connection with all paths relative to the public folder
 const server = new Hapi.Server({
     connections: {
         routes: {
@@ -19,10 +28,6 @@ const server = new Hapi.Server({
         }
     }
 });
-
-const Bell = require('bell')
-
-var AuthCookie = require('hapi-auth-cookie');
 
 server.connection({ port: process.env.PORT || 3000 });
 
@@ -82,7 +87,7 @@ const validateAsAdmin = (request, username, password, callback) => {
 };
 
 // Register basic auth scheme with Hapi
-server.register([Basic,Bell, AuthCookie], err => {
+server.register([Inert, Basic, Bell, AuthCookie], err => {
   if (err) throw err;
 
   // Create user strategy - by supplying the validateAsUser function
@@ -112,11 +117,11 @@ server.register([Basic,Bell, AuthCookie], err => {
   // Create a route with user level authentication
   server.route({
     method: 'GET',
-    path: '/authenticated',
+    path: '/student',
     config: {
       auth: 'user',
       handler(request, reply) {
-        reply(`hello ${request.auth.credentials.name}`);
+        reply.file('student.html');
       }
     }
   });
@@ -128,7 +133,7 @@ server.register([Basic,Bell, AuthCookie], err => {
     config: {
       auth: 'admin',
       handler(request, reply) {
-        reply(`hello ${request.auth.credentials.name}`);
+        reply.file('teacher.html');
       }
     }
   });
