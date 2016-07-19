@@ -1,4 +1,3 @@
-'use strict'
 const Hapi = require('hapi');
 
 // Bcrypt module - creates a hash and provides method for comparing a string to a hash
@@ -9,7 +8,7 @@ const Basic = require('hapi-auth-basic');
 
 // Bell is a module for interacting with the 3rd party authentication of some popular
 // websites such as facebook and twitter
-const Bell = require('bell')
+const Bell = require('bell');
 
 // Auth cookie module for Hapi
 const AuthCookie = require('hapi-auth-cookie');
@@ -36,14 +35,14 @@ const users = {
   troy: {
     username: 'troy',
     password: '$2a$08$fV9AJ7I21AhZhtRoXoV16u4h/pN1kWBLMPKkQE8BkH/.cgaOwbMi2',
-    name: 'John Doe',
+    name: 'Troy Student',
     id: '2133d32a',
     isAdmin: false,
   },
   rory: {
     username: 'rory',
     password: '$2a$08$fV9AJ7I21AhZhtRoXoV16u4h/pN1kWBLMPKkQE8BkH/.cgaOwbMi2',
-    name: 'John Doe',
+    name: 'Rory Teacher',
     id: '4133d32a',
     isAdmin: true,
   },
@@ -102,8 +101,8 @@ server.register([Inert, Basic, Bell, AuthCookie], err => {
   //Create cookie strategy
   server.auth.strategy('site-point-cookie', 'cookie', authCookieOptions);
 
-  // default on cookie
-  server.auth.default('site-point-cookie');
+  // Set a default auth for all routes
+  // server.auth.default('site-point-cookie');
 
   // Create an unauthenticated route
   server.route({
@@ -129,7 +128,7 @@ server.register([Inert, Basic, Bell, AuthCookie], err => {
   // Create a route with admin level authentication
   server.route({
     method: 'GET',
-    path: '/admin',
+    path: '/teacher',
     config: {
       auth: 'admin',
       handler(request, reply) {
@@ -145,7 +144,6 @@ server.register([Inert, Basic, Bell, AuthCookie], err => {
       auth: 'github-oauth',
       handler: function (request, reply) {
         if (request.auth.isAuthenticated) {
-          console.log(request.auth.session)
           request.cookieAuth.set(request.auth.credentials);
           return reply('Hello ' + request.auth.credentials.profile.displayName);
         }
