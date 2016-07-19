@@ -2,17 +2,32 @@
 const Hapi = require('hapi');
 
 // Bcrypt module - creates a hash and provides method for comparing a string to a hash
-const Bcrypt = require('bcrypt');
+const Bcrypt = require('bcryptjs');
 
 // Basic Authentication Scheme for Hapi (https://github.com/hapijs/hapi-auth-basic)
 const Basic = require('hapi-auth-basic');
 
-// Create server and start a connection
-const server = new Hapi.Server();
-
+// Bell is a module for interacting with the 3rd party authentication of some popular
+// websites such as facebook and twitter
 const Bell = require('bell')
 
-var AuthCookie = require('hapi-auth-cookie');
+// Auth cookie module for Hapi
+const AuthCookie = require('hapi-auth-cookie');
+
+// Path and Inert are used to serve up static files
+const Path = require('path');
+const Inert = require('inert');
+
+// Create server and start a connection with all paths relative to the public folder
+const server = new Hapi.Server({
+    connections: {
+        routes: {
+            files: {
+                relativeTo: Path.join(__dirname, 'public')
+            }
+        }
+    }
+});
 
 server.connection({ port: process.env.PORT || 3000 });
 
@@ -72,7 +87,7 @@ const validateAsAdmin = (request, username, password, callback) => {
 };
 
 // Register basic auth scheme with Hapi
-server.register([Basic,Bell, AuthCookie], err => {
+server.register([Inert, Basic, Bell, AuthCookie], err => {
   if (err) throw err;
 
   // Create user strategy - by supplying the validateAsUser function
@@ -95,18 +110,18 @@ server.register([Basic,Bell, AuthCookie], err => {
     method: 'GET',
     path: '/',
     handler(request, reply) {
-      reply('Unauthenticated');
+      reply.file('index.html');
     }
   });
 
   // Create a route with user level authentication
   server.route({
     method: 'GET',
-    path: '/authenticated',
+    path: '/student',
     config: {
       auth: 'user',
       handler(request, reply) {
-        reply(`hello ${request.auth.credentials.name}`);
+        reply.file('student.html');
       }
     }
   });
@@ -118,7 +133,7 @@ server.register([Basic,Bell, AuthCookie], err => {
     config: {
       auth: 'admin',
       handler(request, reply) {
-        reply(`hello ${request.auth.credentials.name}`);
+        reply.file('teacher.html');
       }
     }
   });
@@ -133,7 +148,7 @@ server.register([Basic,Bell, AuthCookie], err => {
           console.log(request.auth.session)
           request.cookieAuth.set(request.auth.credentials);
           return reply('Hello ' + request.auth.credentials.profile.displayName);
-        }    
+        }
       }
     }
   });

@@ -1,25 +1,13 @@
-document.getElementById('student-login').addEventListener('click', goToStudentPage);
-document.getElementById('teacher-login').addEventListener('click', goToTeacherPage);
+document.getElementById('student-login').addEventListener('click', makeGetRequest('/student'));
+document.getElementById('teacher-login').addEventListener('click', makeGetRequest('/teacher'));
 const backButtons = document.getElementsByClassName('back-button');
 backButtons.forEach(function(element){
-  element.addEventListener('click', backToHomepage);
+  element.addEventListener('click', makeGetRequest('/'));
 });
 
-function goToStudentPage() {
-  makeXhrRequest('GET', '/student', 'text/html');
-}
-
-function goToTeacherPage() {
-  makeXhrRequest('GET', '/teacher', 'text/html');
-}
-
-function backToHomepage() {
-  makeXhrRequest('GET', '/', 'text/html');
-}
-
-function makeXhrRequest(method, endpoint, contentType) {
+function makeGetRequest(endpoint) {
   const xhr = new XMLHttpRequest();
-  xhr.open(method, endpoint, true);
-  xhr.setRequestHeader('Content-Type', contentType);
+  xhr.open('GET', endpoint, true);
+  xhr.setRequestHeader('Content-Type', 'text/html');
   xhr.send();
 }
